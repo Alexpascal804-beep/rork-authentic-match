@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Ban,
   X,
+  MapPin,
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,6 +27,7 @@ import Colors from "@/constants/colors";
 const FEATURE_ICONS: Record<string, any> = {
   unlimitedLikes: Heart,
   advancedFilters: Zap,
+  distanceControl: MapPin,
   seeWhoLikedYou: Eye,
   priorityVisibility: TrendingUp,
   readReceipts: CheckCircle2,

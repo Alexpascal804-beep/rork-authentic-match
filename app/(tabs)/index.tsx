@@ -327,7 +327,10 @@ const UserCard = React.memo(function UserCard({ user }: { user: User }) {
         </View>
         <View style={styles.locationRow}>
           <MapPin color={Colors.mediumGray} size={14} />
-          <Text style={styles.location}>{user.location}</Text>
+          <Text style={styles.location}>
+            {user.location}
+            {user.distanceInMiles && ` • ${user.distanceInMiles} mi away`}
+          </Text>
         </View>
         <Text style={styles.bio} numberOfLines={2}>
           {user.bio}

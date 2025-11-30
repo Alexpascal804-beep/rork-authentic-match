@@ -28,6 +28,7 @@ export const mockUsers: User[] = [
     verified: true,
     occupation: "UX Designer",
     education: "Stanford University",
+    distanceInMiles: 12,
   },
   {
     id: "2",
@@ -54,6 +55,7 @@ export const mockUsers: User[] = [
     verified: true,
     occupation: "Software Engineer",
     education: "UC Berkeley",
+    distanceInMiles: 8,
   },
   {
     id: "3",
@@ -79,6 +81,7 @@ export const mockUsers: User[] = [
     location: "San Francisco, CA",
     verified: true,
     occupation: "Yoga Instructor",
+    distanceInMiles: 35,
   },
   {
     id: "4",
@@ -105,6 +108,7 @@ export const mockUsers: User[] = [
     verified: true,
     occupation: "Architect",
     education: "MIT",
+    distanceInMiles: 45,
   },
   {
     id: "5",
@@ -130,6 +134,7 @@ export const mockUsers: User[] = [
     location: "San Francisco, CA",
     verified: true,
     occupation: "Veterinarian",
+    distanceInMiles: 22,
   },
 ];
 

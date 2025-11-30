@@ -10,6 +10,7 @@ export interface User {
   verified: boolean;
   occupation?: string;
   education?: string;
+  distanceInMiles?: number;
 }
 
 export interface Prompt {

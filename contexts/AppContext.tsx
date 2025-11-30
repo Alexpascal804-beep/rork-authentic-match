@@ -2,8 +2,10 @@ import createContextHook from "@nkzw/create-context-hook";
 import { useState, useMemo, useCallback } from "react";
 import { User, Match, Chat, Message } from "@/types";
 import { mockUsers, mockMatches, currentUserId } from "@/mocks/users";
+import { useVIP } from "@/contexts/VIPContext";
 
 export const [AppProvider, useApp] = createContextHook(() => {
+  const { isVIP, maxDistance } = useVIP();
   const [users] = useState<User[]>(mockUsers);
   const [matches, setMatches] = useState<Match[]>(mockMatches);
   const [dailyLikesRemaining, setDailyLikesRemaining] = useState(20);
@@ -85,13 +87,22 @@ export const [AppProvider, useApp] = createContextHook(() => {
 
   const availableUsers = useMemo(() => {
     const matchedIds = matches.map((m) => m.user.id);
-    return users.filter(
+    let filtered = users.filter(
       (u) =>
         !matchedIds.includes(u.id) &&
         !likedUserIds.includes(u.id) &&
         !passedUserIds.includes(u.id)
     );
-  }, [users, matches, likedUserIds, passedUserIds]);
+
+    if (isVIP && maxDistance) {
+      filtered = filtered.filter(
+        (u) => !u.distanceInMiles || u.distanceInMiles <= maxDistance
+      );
+      console.log(`VIP Distance Filter: Showing users within ${maxDistance} miles`);
+    }
+
+    return filtered;
+  }, [users, matches, likedUserIds, passedUserIds, isVIP, maxDistance]);
 
   const likeUser = useCallback((userId: string) => {
     if (dailyLimitEnabled && dailyLikesRemaining <= 0) {

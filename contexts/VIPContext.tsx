@@ -9,11 +9,13 @@ export interface VIPSubscription {
   subscribedAt?: Date;
   expiresAt?: Date;
   paymentMethod?: PaymentMethod;
+  maxDistance?: number;
 }
 
 export const VIP_FEATURES = {
   unlimitedLikes: "Unlimited daily likes",
   advancedFilters: "Advanced matching filters",
+  distanceControl: "Control search distance up to 50 miles",
   seeWhoLikedYou: "See who liked you",
   priorityVisibility: "Priority profile visibility",
   readReceipts: "Read receipts in messages",
@@ -53,15 +55,20 @@ export const VIP_PRICE = getVIPPrice("USD");
 export const VIP_PRICE_XAF = getVIPPrice("XAF");
 
 const VIP_STORAGE_KEY = "@benin_meet_vip";
+const VIP_DISTANCE_KEY = "@benin_meet_vip_distance";
+export const MAX_VIP_DISTANCE = 50;
+export const DEFAULT_DISTANCE = 25;
 
 export const [VIPProvider, useVIP] = createContextHook(() => {
   const [subscription, setSubscription] = useState<VIPSubscription>({
     isVIP: false,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [maxDistance, setMaxDistance] = useState<number>(DEFAULT_DISTANCE);
 
   useEffect(() => {
     loadSubscription();
+    loadDistance();
   }, []);
 
   const loadSubscription = async () => {
@@ -116,6 +123,31 @@ export const [VIPProvider, useVIP] = createContextHook(() => {
   const cancelSubscription = async () => {
     setSubscription({ isVIP: false });
     await AsyncStorage.removeItem(VIP_STORAGE_KEY);
+    setMaxDistance(DEFAULT_DISTANCE);
+    await AsyncStorage.removeItem(VIP_DISTANCE_KEY);
+  };
+
+  const loadDistance = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(VIP_DISTANCE_KEY);
+      if (stored) {
+        setMaxDistance(parseInt(stored, 10));
+      }
+    } catch (error) {
+      console.error("Failed to load VIP distance:", error);
+    }
+  };
+
+  const updateMaxDistance = async (distance: number) => {
+    if (!subscription.isVIP) {
+      console.log("Distance control is a VIP feature");
+      return false;
+    }
+    
+    const clampedDistance = Math.min(Math.max(1, distance), MAX_VIP_DISTANCE);
+    setMaxDistance(clampedDistance);
+    await AsyncStorage.setItem(VIP_DISTANCE_KEY, clampedDistance.toString());
+    return true;
   };
 
   return {
@@ -124,5 +156,7 @@ export const [VIPProvider, useVIP] = createContextHook(() => {
     isLoading,
     subscribe,
     cancelSubscription,
+    maxDistance,
+    updateMaxDistance,
   };
 });

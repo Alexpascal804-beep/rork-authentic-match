@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Alert,
 } from "react-native";
 import {
   User,
@@ -21,11 +22,14 @@ import {
   Sun,
   Smartphone,
   Wallet,
+  MapPin,
+  Minus,
+  Plus,
 } from "lucide-react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
-import { useVIP } from "@/contexts/VIPContext";
+import { useVIP, MAX_VIP_DISTANCE } from "@/contexts/VIPContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useWallet } from "@/contexts/WalletContext";
@@ -34,7 +38,7 @@ import { LightColors, DarkColors } from "@/constants/colors";
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const { isVIP } = useVIP();
+  const { isVIP, maxDistance, updateMaxDistance } = useVIP();
   const { currentLanguage } = useLanguage();
   const { theme, isDark, setTheme } = useTheme();
   const { balance } = useWallet();
@@ -132,6 +136,99 @@ export default function SettingsScreen() {
             <ChevronRight color={Colors.mediumGray} size={20} />
           </TouchableOpacity>
         </View>
+
+        {isVIP && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: Colors.mediumGray }]}>VIP Distance Control</Text>
+            
+            <View style={[styles.settingItem, { backgroundColor: Colors.cardBackground }]}>
+              <View style={styles.settingLeft}>
+                <View style={[styles.iconContainer, { backgroundColor: isDark ? "#4D2D00" : "#FFF3E0" }]}>
+                  <MapPin color={Colors.luxuryGold} size={20} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.settingText, { color: Colors.textPrimary }]}>Maximum Distance</Text>
+                  <Text style={[styles.settingDescription, { color: Colors.textSecondary }]}>
+                    {maxDistance} miles
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.distanceControls, { backgroundColor: Colors.cardBackground }]}>
+              <TouchableOpacity
+                style={[styles.distanceButton, { borderColor: Colors.border }]}
+                onPress={() => {
+                  if (maxDistance > 1) {
+                    updateMaxDistance(maxDistance - 1);
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Minus color={maxDistance > 1 ? Colors.textPrimary : Colors.mediumGray} size={20} />
+              </TouchableOpacity>
+              
+              <View style={styles.distanceSliderContainer}>
+                <View style={[styles.distanceBar, { backgroundColor: Colors.border }]}>
+                  <View 
+                    style={[
+                      styles.distanceProgress,
+                      { 
+                        backgroundColor: Colors.luxuryGold,
+                        width: `${(maxDistance / MAX_VIP_DISTANCE) * 100}%`,
+                      },
+                    ]} 
+                  />
+                </View>
+                <View style={styles.distanceLabels}>
+                  <Text style={[styles.distanceLabel, { color: Colors.textSecondary }]}>1 mi</Text>
+                  <Text style={[styles.distanceLabel, { color: Colors.textSecondary }]}>{MAX_VIP_DISTANCE} mi</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.distanceButton, { borderColor: Colors.border }]}
+                onPress={() => {
+                  if (maxDistance < MAX_VIP_DISTANCE) {
+                    updateMaxDistance(maxDistance + 1);
+                  } else {
+                    Alert.alert(
+                      "Maximum Distance Reached",
+                      `VIP members can set distance up to ${MAX_VIP_DISTANCE} miles.`
+                    );
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Plus color={maxDistance < MAX_VIP_DISTANCE ? Colors.textPrimary : Colors.mediumGray} size={20} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={[styles.distanceQuickActions, { backgroundColor: Colors.cardBackground }]}>
+              {[5, 10, 25, 50].map((distance) => (
+                <TouchableOpacity
+                  key={distance}
+                  style={[
+                    styles.quickDistanceButton,
+                    { 
+                      borderColor: maxDistance === distance ? Colors.luxuryGold : Colors.border,
+                      backgroundColor: maxDistance === distance ? (isDark ? "#4D2D00" : "#FFF3E0") : "transparent",
+                    },
+                  ]}
+                  onPress={() => updateMaxDistance(distance)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[
+                    styles.quickDistanceText,
+                    { color: maxDistance === distance ? Colors.luxuryGold : Colors.textSecondary },
+                  ]}>
+                    {distance} mi
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: Colors.mediumGray }]}>{t("settings.account")}</Text>
@@ -530,6 +627,62 @@ const styles = StyleSheet.create({
   },
   themeOptionLabel: {
     fontSize: 13,
+    fontWeight: "600" as const,
+  },
+  distanceControls: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: 16,
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  distanceButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+  },
+  distanceSliderContainer: {
+    flex: 1,
+    gap: 8,
+  },
+  distanceBar: {
+    height: 8,
+    borderRadius: 4,
+    overflow: "hidden" as const,
+  },
+  distanceProgress: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  distanceLabels: {
+    flexDirection: "row" as const,
+    justifyContent: "space-between" as const,
+  },
+  distanceLabel: {
+    fontSize: 11,
+    fontWeight: "500" as const,
+  },
+  distanceQuickActions: {
+    flexDirection: "row" as const,
+    gap: 12,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+  },
+  quickDistanceButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 2,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+  },
+  quickDistanceText: {
+    fontSize: 14,
     fontWeight: "600" as const,
   },
 });
