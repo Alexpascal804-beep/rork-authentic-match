@@ -24,6 +24,7 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerBackTitle: "Back" }}>
       <Stack.Screen name="onboarding/welcome" options={{ headerShown: false, presentation: "modal" }} />
       <Stack.Screen name="onboarding/personality-quiz" options={{ headerShown: false }} />
+      <Stack.Screen name="onboarding/face-verification" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding/profile-setup" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="chat/[matchId]" options={{ headerShown: false }} />
