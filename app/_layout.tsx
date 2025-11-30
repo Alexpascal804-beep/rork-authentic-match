@@ -12,6 +12,7 @@ import { WalletProvider } from "@/contexts/WalletContext";
 import { AdminProvider } from "@/contexts/AdminContext";
 import { FeedProvider } from "@/contexts/FeedContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { trpc, trpcClient } from "@/lib/trpc";
 import "@/lib/i18n";
 
 SplashScreen.preventAutoHideAsync();
@@ -55,27 +56,29 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <LanguageProvider>
-            <AdminProvider>
-              <WalletProvider>
-                <VIPProvider>
-                  <LiveStreamProvider>
-                    <FeedProvider>
-                      <AppProvider>
-                        <GestureHandlerRootView style={{ flex: 1 }}>
-                          <RootLayoutNav />
-                        </GestureHandlerRootView>
-                      </AppProvider>
-                    </FeedProvider>
-                  </LiveStreamProvider>
-                </VIPProvider>
-              </WalletProvider>
-            </AdminProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <LanguageProvider>
+              <AdminProvider>
+                <WalletProvider>
+                  <VIPProvider>
+                    <LiveStreamProvider>
+                      <FeedProvider>
+                        <AppProvider>
+                          <GestureHandlerRootView style={{ flex: 1 }}>
+                            <RootLayoutNav />
+                          </GestureHandlerRootView>
+                        </AppProvider>
+                      </FeedProvider>
+                    </LiveStreamProvider>
+                  </VIPProvider>
+                </WalletProvider>
+              </AdminProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
     </ErrorBoundary>
   );
 }
